@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 from sklearn.model_selection import train_test_split
 import numpy as np
 from scipy.io import wavfile
-import matplotlib.pyplot as plt
 import librosa
 import os
 from CoAtNet import CoAtNet as CoAtNet 
