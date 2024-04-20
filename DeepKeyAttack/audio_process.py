@@ -39,10 +39,10 @@ def isolator(signal, sample_rate, size, scan, before, after, threshold, show=Fal
             prev_end = timestamp+after
     return strokes
 
-AUDIO_FILE = './Zoom/'
+AUDIO_FILE = 'Keystroke-Datasets/MBPWavs/'
 keys_s = '1234567890qwertyuiopasdfghjklzxcvbnm'
 labels = list(keys_s)
-keys = [k + '.wav' for k in labels]
+keys = [f"{k}.wav" for k in labels]
 data_dict = {'Key':[], 'File':[]}
 
 for i, File in enumerate(keys):
@@ -74,3 +74,5 @@ for l in df['Key']:
         mapper[l] = counter
         counter += 1
 df.replace({'Key': mapper}, inplace=True)
+
+print(df)
