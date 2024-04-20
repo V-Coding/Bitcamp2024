@@ -3,8 +3,9 @@ import torch
 import numpy as np
 import librosa
 import pandas as pd
+import soundfile as sf
 
-def isolator(signal, sample_rate, size, scan, before, after, threshold, show=False):
+def isolator(signal, sample_rate, size, scan, before, after, threshold, show=False, keyName=""):
     strokes = []
     # -- signal'
     if show:
@@ -27,11 +28,14 @@ def isolator(signal, sample_rate, size, scan, before, after, threshold, show=Fal
     peak_count = len(peaks)
     prev_end = sample_rate*0.1*(-1)
     # '-- isolating keystrokes'
+    counter=0
     for i in range(peak_count):
         this_peak = peaks[i]
         timestamp = (this_peak*scan) + size//2
         if timestamp > prev_end + (0.1*sample_rate):
             keystroke = signal[timestamp-before:timestamp+after]
+            sf.write(f"DeepKeyAttack/Processed/{keyName}_{counter}.wav", keystroke, sample_rate)
+            counter += 1
             strokes.append(torch.tensor(keystroke)[None, :])
             if show:
                 plt.figure(figsize=(7, 2))
@@ -53,7 +57,7 @@ for i, File in enumerate(keys):
     prom = 0.06
     step = 0.005
     while not len(strokes) == 25:
-        strokes = isolator(samples[1*sample_rate:], sample_rate, 48, 24, 2400, 12000, prom, False)
+        strokes = isolator(samples[1*sample_rate:], sample_rate, 48, 24, 2400, 12000, prom, False, keyName=File.split(".")[0])
         if len(strokes) < 25:
             prom -= step
         if len(strokes) > 25:
