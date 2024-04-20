@@ -63,6 +63,8 @@ for i, File in enumerate(keys):
             break
         step = step*0.99
     label = [labels[i]]*len(strokes)
+    print("Label:", label, "\n", "KeyStrokes:", strokes)
+    print("\n\n")
     data_dict['Key'] += label
     data_dict['File'] += strokes
 
