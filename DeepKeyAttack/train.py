@@ -9,17 +9,17 @@ from scipy.io import wavfile
 import matplotlib.pyplot as plt
 import librosa
 import os
-import CoAtNet
+from CoAtNet import CoAtNet as CoAtNet 
 
 # Assume we have the following paths. Depend on your system, it could vary
-AUDIO_DIR = 'C:/Users/vishr/OneDrive/Desktop/Bitcamp2024/Keystroke-Datasets/MBPWavs'
+AUDIO_DIR = 'C:/Users/vishr/OneDrive/Desktop/Bitcamp2024/Bitcamp2024/Keystroke-Datasets/MBPWavs'
 MODEL_PATH = '/Models/model.pt'
 
 
 # The following class help transform our input into mel-spectrogram
 class ToMelSpectrogram:
     def __call__(self, samples):
-        return librosa.feature.melspectrogram(samples, n_mels=64, length=1024, hop_length=225)
+        return librosa.feature.melspectrogram(y=samples, n_mels=64, win_length=1024, hop_length=225)
 
 
 # This class is to load audio data and apply the transformation
