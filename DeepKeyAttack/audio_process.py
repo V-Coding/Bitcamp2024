@@ -34,7 +34,7 @@ def isolator(signal, sample_rate, size, scan, before, after, threshold, show=Fal
         timestamp = (this_peak*scan) + size//2
         if timestamp > prev_end + (0.1*sample_rate):
             keystroke = signal[timestamp-before:timestamp+after]
-            sf.write(f"DeepKeyAttack/Processed/{keyName}_{counter}.wav", keystroke, sample_rate)
+            # sf.write(f"DeepKeyAttack/Processed/{keyName}_{counter}.wav", keystroke, sample_rate)
             counter += 1
             strokes.append(torch.tensor(keystroke)[None, :])
             if show:
