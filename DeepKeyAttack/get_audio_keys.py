@@ -3,10 +3,13 @@ import numpy as np
 import soundfile as sf
 import torch
 import matplotlib.pyplot as plt
+import noisereduce as nr
 
-audio_file = "DeepKeyAttack/UploadedAudio/playingSoccer.wav"
+audio_file = "DeepKeyAttack/UploadedAudio/ThisIsTheFirst.wav"
 audio_data, sample_rate = librosa.load(audio_file, sr=None)
-energy_env = np.abs(audio_data)
+reduced_noise = nr.reduce_noise(y=audio_data, sr=sample_rate, stationary=True)
+energy_env = np.average(np.abs(reduced_noise))
+# print(energy_env)
 thresh = np.percentile(energy_env, 90)
 
 def isolator(signal, sample_rate, size, scan, before, after, threshold, show=False):
@@ -43,25 +46,26 @@ def isolator(signal, sample_rate, size, scan, before, after, threshold, show=Fal
 
 def isolate_num_strokes(num_strokes):
     samples, sample_rate = librosa.load(audio_file, sr=None)
+    samples = nr.reduce_noise(y=samples, sr=sample_rate, stationary=True)
     strokes = []
     prom = 0.06
     step = 0.0025
-    while not len(strokes) == num_strokes:
-        strokes = isolator(samples[1*sample_rate:], sample_rate, 48, 24, int(2400/2), int(12000/2), prom, False)
-        if len(strokes) < num_strokes:
-            prom -= step
-        if len(strokes) > num_strokes:
-            prom += step
-        if prom <= 0:
-            print('-- not possible for: ', audio_file)
-            break
-        step = step*0.99
+    # while not len(strokes) == num_strokes:
+    #     strokes = isolator(samples[1*sample_rate:], sample_rate, 48, 24, int(2400/2), int(12000/2), prom, False)
+    #     if len(strokes) < num_strokes:
+    #         prom -= step
+    #     if len(strokes) > num_strokes:
+    #         prom += step
+    #     if prom <= 0.06:
+    #         print('-- not possible for: ', audio_file)
+    #         break
+    #     step = step*0.99
+    strokes = isolator(samples[1*sample_rate:], sample_rate, 48, 24, int(2400/2), int(12000/2), prom/2, False)
 
     # Extract keystroke segments
     print(len(strokes))
-    print(strokes[0])
     for i, stroke in enumerate(strokes):
         keystroke_segment = stroke
         sf.write(f"DeepKeyAttack/Keystrokes/keystroke_{i}.wav", keystroke_segment, sample_rate)
 
-isolate_num_strokes(26)
+isolate_num_strokes(36)
