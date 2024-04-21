@@ -25,8 +25,8 @@ def post_endpoint():
     isolate_num_strokes("DeepKeyAttack/UploadedAudio/" + filename)
     predictions = predict()
     print(predictions)
-
-    return jsonify({'message': 'Received audio file:', 'filename': audio_file.filename})
+    keystroke_string = "".join(predictions)
+    return jsonify({'message': 'Received audio file:', 'filename': audio_file.filename, "keystrokes": keystroke_string})
 
 if __name__ == '__main__':
     app.run(debug=False)
