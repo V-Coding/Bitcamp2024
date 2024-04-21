@@ -20,9 +20,9 @@ def post_endpoint():
     
     if audio_file:
         filename = "server_upload.wav"
-        audio_file.save("DeepKeyAttack/UploadedAudio/", filename)
+        audio_file.save("./DeepKeyAttack/UploadedAudio/", filename)
     
-    isolate_num_strokes("DeepKeyAttack/UploadedAudio/" + filename)
+    isolate_num_strokes("./DeepKeyAttack/UploadedAudio/" + filename)
     predictions = predict()
     print(predictions)
     keystroke_string = "".join(predictions)
