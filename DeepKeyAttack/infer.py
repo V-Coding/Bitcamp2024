@@ -22,6 +22,29 @@ class ToMelSpectrogram:
     def __call__(self, samples):
         return librosa.feature.melspectrogram(samples, n_mels=64, length=1024, hop_length=225)
 
+class TestDataset(torch.utils.data.Dataset):
+    def __init__(self, data_dir, transform=None):
+        self.data_dir = data_dir
+        self.transform = transform
+        self.file_list = sorted(os.listdir(self.data_dir))
+        print(self.file_list)
+    def __len__(self):
+        return len(self.file_list)
+
+    def __getitem__(self, idx):
+        waveform, _ = librosa.load(os.path.join(self.data_dir, self.file_list[idx]),
+                                   sr=None,
+                                   duration=1.0,
+                                   mono=True)
+
+        label = self.file_list[idx].split("_")[0]  # Assuming the file name is 'label_otherInfo.wav'
+        print(self.file_list[idx])
+        if self.transform:
+            waveform = self.transform(waveform)
+        print(waveform.shape)
+
+        return waveform
+
 class PredictDataset(torch.utils.data.Dataset):
     def __init__(self, audio_paths, transform=None):
         self.audio_paths = audio_paths
@@ -41,43 +64,48 @@ class PredictDataset(torch.utils.data.Dataset):
         return audio_clip
 
 
-def load_model(path):
-    model = CoAtNet()  # should match the architecture of the trained model
-    model.load_state_dict(torch.load(path))
+def load_model(model_path):
+    model = CoAtNet()
+    save_dict = torch.load(model_path)
+    model.load_state_dict(save_dict)
     model.eval()
     return model
 
+def number_to_letter(number):
+    if isinstance(number, int) and number >= 0:
+        if number < 10:
+            return str(number)
+        elif number >= 10 and number <= 35:
+            return chr(number - 10 + ord('A'))
+    return None
 
-def predict(audio_paths):
-    model = load_model(MODEL_PATH)
-
-    transform = transforms.Compose([
-        # add transforms that were used while training
-        ToMelSpectrogram(), ToTensor()
-    ])
-
-    dataset = PredictDataset(audio_paths, transform=transform)
+def predict(model_path="DeepKeyAttack/Models/model.pt", audio_path="DeepKeyAttack/Keystrokes/"):
+    model = load_model(model_path)
+    transform = Compose([ToMelSpectrogram(), ToTensor()])
+    dataset = TestDataset(audio_path, transform=transform)
     data_loader = DataLoader(dataset, batch_size=1, shuffle=False)
 
     predictions = []
 
+    model = model.cuda()
     for batch in data_loader:
         batch = batch.cuda()
         outputs = model(batch)
         _, predicted = torch.max(outputs.data, 1)  # change if multi-label classification
+
+        print(number_to_letter(predicted.cpu()[0].item()))
+
         predictions.append(predicted.item())
 
-    return predictions
-
-def main():
-    audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]  # replace with actual paths
-    # actual paths
-    audio_paths = [[f"{AUDIO_DIR}/{j}.wav" for j in range(10)]]
-    for i in list(range(26)):
-        audio_paths.append(f"{AUDIO_DIR}/{chr(ord('A') + i)}.wav")
+# def main():
+#     audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]  # replace with actual paths
+#     # actual paths
+#     audio_paths = [[f"{AUDIO_DIR}/{j}.wav" for j in range(10)]]
+#     for i in list(range(26)):
+#         audio_paths.append(f"{AUDIO_DIR}/{chr(ord('A') + i)}.wav")
     
-    predictions = predict(audio_paths)
-    print(predictions)
+#     predictions = predict(audio_paths)
+#     print(predictions)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

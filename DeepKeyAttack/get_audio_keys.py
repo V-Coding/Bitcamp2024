@@ -4,7 +4,7 @@ import soundfile as sf
 import torch
 import matplotlib.pyplot as plt
 import noisereduce as nr
-
+import os
 
 
 class AudioFileParser():
@@ -55,7 +55,25 @@ class AudioFileParser():
                 prev_end = timestamp+after
         return strokes
 
+def clearKeystrokesDir(directory="DeepKeyAttack/Keystrokes/"):
+    
+    try:
+        # List all files in the directory
+        files = os.listdir(directory)
+        # Iterate through each file
+        for file in files:
+            # Check if the file is a WAV file
+            # Construct the full path to the file
+            file_path = os.path.join(directory, file)
+            
+            # Delete the file
+            os.remove(file_path)
+            print(f"Deleted: {file}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
 def isolate_num_strokes(audio_file):
+    clearKeystrokesDir()
     parser = AudioFileParser(audio_file)
     strokes = parser.isolator()
     ''' 
