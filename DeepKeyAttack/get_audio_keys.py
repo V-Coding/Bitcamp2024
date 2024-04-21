@@ -20,8 +20,8 @@ class AudioFileParser():
         signal = samples[1*self.sample_rate:]
         size = 48
         scan = 24
-        before = int(2400/4)
-        after = int(12000/4)
+        before = int(2400/3)
+        after = int(12000/3)
         prom = 0.06
         threshold = prom/2
         strokes = []
