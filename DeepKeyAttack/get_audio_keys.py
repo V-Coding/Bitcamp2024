@@ -95,4 +95,4 @@ def isolate_num_strokes(audio_file):
         keystroke_segment = stroke
         sf.write(f"DeepKeyAttack/Keystrokes/keystroke_{i}.wav", keystroke_segment, parser.sample_rate)
 
-isolate_num_strokes("DeepKeyAttack/UploadedAudio/ThisIsTheFirst.wav")
+# isolate_num_strokes("DeepKeyAttack/UploadedAudio/ThisIsTheFirst.wav")

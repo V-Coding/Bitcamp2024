@@ -96,6 +96,7 @@ def predict(model_path="DeepKeyAttack/Models/model.pt", audio_path="DeepKeyAttac
         print(number_to_letter(predicted.cpu()[0].item()))
 
         predictions.append(predicted.item())
+    return predictions
 
 # def main():
 #     audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]  # replace with actual paths
