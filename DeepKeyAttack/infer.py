@@ -20,7 +20,7 @@ AUDIO_DIR = '../Keystroke-Datasets/MBPWavs'
 
 class ToMelSpectrogram:
     def __call__(self, samples):
-        return librosa.feature.melspectrogram(samples, n_mels=64, length=1024, hop_length=225)
+        return librosa.feature.melspectrogram(y=samples, n_mels=64, win_length=1024, hop_length=225)
 
 class TestDataset(torch.utils.data.Dataset):
     def __init__(self, data_dir, transform=None):
@@ -66,7 +66,7 @@ class PredictDataset(torch.utils.data.Dataset):
 
 def load_model(model_path):
     model = CoAtNet()
-    save_dict = torch.load(model_path)
+    save_dict = torch.load(model_path, map_location=torch.device('cpu'))
     model.load_state_dict(save_dict)
     model.eval()
     return model
@@ -87,16 +87,19 @@ def predict(model_path="DeepKeyAttack/Models/model.pt", audio_path="DeepKeyAttac
 
     predictions = []
 
-    model = model.cuda()
+    # model = model.cuda()
     for batch in data_loader:
-        batch = batch.cuda()
+        # batch = batch.cuda()
         outputs = model(batch)
         _, predicted = torch.max(outputs.data, 1)  # change if multi-label classification
 
         print(number_to_letter(predicted.cpu()[0].item()))
 
         predictions.append(predicted.item())
-    return predictions
+    keystrokeString = ""
+    for i in predictions:
+        keystrokeString += number_to_letter(i)
+    return keystrokeString
 
 # def main():
 #     audio_paths = ["audio1.wav", "audio2.wav", "audio3.wav"]  # replace with actual paths

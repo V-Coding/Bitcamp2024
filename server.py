@@ -26,7 +26,7 @@ def post_endpoint():
     isolate_num_strokes(os.path.join(uploads_dir, filename))
     predictions = predict()
     print(predictions)
-    keystroke_string = "".join(predictions)
+    keystroke_string = predictions
     return jsonify({'message': 'Received audio file:', 'filename': audio_file.filename, "keystrokes": keystroke_string})
 
 if __name__ == '__main__':
