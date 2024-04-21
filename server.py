@@ -14,14 +14,14 @@ def post_endpoint():
     
 
     audio_file = request.files['audio']
-    uploads_dir = "./DeepKeyAttack/UploadedAudio/"
+    uploads_dir = "C:/Users/viraj/Keyvesdrop Backend/Bitcamp2024/DeepKeyAttack/UploadedAudio"
     
     if audio_file.filename == '':
         return jsonify({'error': 'No selected file'})
     
     if audio_file:
         filename = "server_upload.wav"
-        audio_file.save(uploads_dir, filename)
+        audio_file.save(f"{uploads_dir}/{filename}")
     
     isolate_num_strokes(os.path.join(uploads_dir, filename))
     predictions = predict()
