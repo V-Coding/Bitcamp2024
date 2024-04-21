@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import sys
+import os
 sys.path.append('DeepKeyAttack/')
 from get_audio_keys import isolate_num_strokes
 from infer import predict
@@ -13,16 +14,16 @@ def post_endpoint():
     
 
     audio_file = request.files['audio']
-
+    uploads_dir = "./DeepKeyAttack/UploadedAudio/"
     
     if audio_file.filename == '':
         return jsonify({'error': 'No selected file'})
     
     if audio_file:
         filename = "server_upload.wav"
-        audio_file.save("./DeepKeyAttack/UploadedAudio/", filename)
+        audio_file.save(uploads_dir, filename)
     
-    isolate_num_strokes("./DeepKeyAttack/UploadedAudio/" + filename)
+    isolate_num_strokes(os.path.join(uploads_dir, filename))
     predictions = predict()
     print(predictions)
     keystroke_string = "".join(predictions)
